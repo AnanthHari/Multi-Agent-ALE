@@ -62,6 +62,8 @@ ale_lib.setFloat.argtypes = [c_void_p, c_char_p, c_float]
 ale_lib.setFloat.restype = None
 ale_lib.loadROM.argtypes = [c_void_p, c_char_p]
 ale_lib.loadROM.restype = None
+ale_lib.isSupportedRom.argtypes = [c_void_p]
+ale_lib.isSupportedRom.restype = c_int
 ale_lib.act.argtypes = [c_void_p, c_int]
 ale_lib.act.restype = c_int
 ale_lib.game_over.argtypes = [c_void_p]
@@ -176,6 +178,9 @@ class ALEInterface(object):
 
     def loadROM(self, rom_file):
         ale_lib.loadROM(self.obj, _str_as_bytes(rom_file))
+
+    def isSupportedRom(self):
+        return ale_lib.isSupportedRom(self.obj) != 0
 
     def act(self, action):
         return ale_lib.act(self.obj, int(action))

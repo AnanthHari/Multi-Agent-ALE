@@ -81,6 +81,9 @@ class ALEInterface {
   // a new ROM to load.
   void loadROM(std::string rom_file = {});
 
+  //checks that the loaded ROM really does have the correct md5 hash
+  bool isSupportedRom();
+
   // Applies an action to the game and returns the reward. It is the
   // user's responsibility to check if the game has ended and reset
   // when necessary - this method will keep pressing buttons on the
@@ -203,7 +206,7 @@ class ALEInterface {
   static void disableBufferedIO();
   static void createOSystem(std::unique_ptr<OSystem>& theOSystem,
                             std::unique_ptr<Settings>& theSettings);
-  static void loadSettings(const std::string& romfile,
+  void loadSettings(const std::string& romfile,
                            std::unique_ptr<OSystem>& theOSystem);
 
  private:

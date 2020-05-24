@@ -109,7 +109,7 @@ void ALEInterface::loadSettings(const std::string& romfile,
     Logger::Error << "ROM file " << romfile << " not found." << std::endl;
     std::exit(1);
   } else if (theOSystem->createConsole(romfile)) {
-    if (!isSupportedRom(theOSystem)) {
+    if (!isSupportedRom()) {
       const Properties properties = theOSystem->console().properties();
       const std::string md5 = properties.get(Cartridge_MD5);
       const std::string name = properties.get(Cartridge_Name);
@@ -120,6 +120,7 @@ void ALEInterface::loadSettings(const std::string& romfile,
                       << std::endl;
       Logger::Warning << "Cartridge_MD5: " << md5 << std::endl;
       Logger::Warning << "Cartridge_name: " << name << std::endl;
+      Logger::Warning << "Expected MD5: " << romSettings->md5() << std::endl;
       Logger::Warning << std::endl;
     }
     Logger::Info << "Running ROM file..." << std::endl;
@@ -215,6 +216,17 @@ void ALEInterface::loadROM(std::string rom_file) {
     std::exit(1);
   }
 #endif
+}
+
+bool ALEInterface::isSupportedRom(){
+  const Properties properties = theOSystem->console().properties();
+  const std::string md5 = properties.get(Cartridge_MD5);
+  const std::string md5_expected(romSettings->md5());
+  if (!md5_expected.compare(0, md5.size(), md5)) {
+    return true;
+  }
+
+  return false;
 }
 
 // Get the value of a setting.

@@ -10,8 +10,12 @@
  * *****************************************************************************
  */
 
+#include <fstream>
+
 #include "Roms.hpp"
 #include "RomUtils.hpp"
+
+#include "emucore/MD5.hxx"
 
 // include the game implementations
 #include "supported/Adventure.hpp"
@@ -229,14 +233,23 @@ static const RomSettings* roms[] = {
     new ZaxxonSettings(),
 };
 
-/* looks for the RL wrapper corresponding to a particular rom title */
+/* looks for the RL wrapper corresponding to a particular rom md5,
+then title in that order. returns null if neither match */
 RomSettings* buildRomRLWrapper(const std::string& rom) {
+  std::ifstream romfile(rom);
+  std::string str((std::istreambuf_iterator<char>(romfile)),
+                   std::istreambuf_iterator<char>());
+  std::string md5_val = MD5((const unsigned char*)str.data(),str.size());
+  for (size_t i = 0; i < sizeof(roms) / sizeof(roms[0]); i++) {
+    if (md5_val == roms[i]->md5())
+      return roms[i]->clone();
+  }
+
   size_t slash_ind = rom.find_last_of("/\\");
   std::string rom_str = rom.substr(slash_ind + 1);
   size_t dot_idx = rom_str.find_first_of(".");
   rom_str = rom_str.substr(0, dot_idx);
   std::transform(rom_str.begin(), rom_str.end(), rom_str.begin(), ::tolower);
-
   for (size_t i = 0; i < sizeof(roms) / sizeof(roms[0]); i++) {
     if (rom_str == roms[i]->rom())
       return roms[i]->clone();
