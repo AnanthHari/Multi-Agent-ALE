@@ -232,19 +232,19 @@ static const RomSettings* roms[] = {
     new YarsRevengeSettings(),
     new ZaxxonSettings(),
 };
-
-/* looks for the RL wrapper corresponding to a particular rom md5,
-then title in that order. returns null if neither match */
-RomSettings* buildRomRLWrapper(const std::string& rom) {
+RomSettings* buildWrapperFromMD5(const std::string& rom){
   std::ifstream romfile(rom);
   std::string str((std::istreambuf_iterator<char>(romfile)),
                    std::istreambuf_iterator<char>());
-  std::string md5_val = MD5((const unsigned char*)str.data(),str.size());
-  for (size_t i = 0; i < sizeof(roms) / sizeof(roms[0]); i++) {
-    if (md5_val == roms[i]->md5())
-      return roms[i]->clone();
-  }
+  std::string md5_hash = MD5((const unsigned char*)str.data(),str.size());
 
+  for (size_t i = 0; i < sizeof(roms) / sizeof(roms[0]); i++) {
+   if (md5_hash == roms[i]->md5())
+     return roms[i]->clone();
+  }
+  return NULL;
+}
+RomSettings* buildWrapperFromFilename(const std::string& rom){
   size_t slash_ind = rom.find_last_of("/\\");
   std::string rom_str = rom.substr(slash_ind + 1);
   size_t dot_idx = rom_str.find_first_of(".");
@@ -254,8 +254,16 @@ RomSettings* buildRomRLWrapper(const std::string& rom) {
     if (rom_str == roms[i]->rom())
       return roms[i]->clone();
   }
-
   return NULL;
+}
+/* looks for the RL wrapper corresponding to a particular rom md5,
+then title in that order. returns null if neither match */
+RomSettings* buildRomRLWrapper(const std::string& rom) {
+  RomSettings* settings = buildWrapperFromMD5(rom);
+  if(!settings){
+    settings = buildWrapperFromFilename(rom);
+  }
+  return settings;
 }
 
 }  // namespace ale

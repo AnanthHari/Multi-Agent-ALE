@@ -98,7 +98,7 @@ def _parse_version(filename):
             2) Running in CI with a version tag will be of the form TAGGED_VERSION
     raises:
         RuntimeError:
-            1) Unable to find ALEVERSION in `filename` 
+            1) Unable to find ALEVERSION in `filename`
         AssertionError:
             1) Running in CI and tagged version doesn't match parsed version
             2) Tagged version or parsed version doesn't conform to semver rules
